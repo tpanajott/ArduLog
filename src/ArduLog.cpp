@@ -17,10 +17,3 @@ void ArduLog::SetSerial(HardwareSerial *serial) {
 void ArduLog::SetLogLevel(const ArduLogLevel logLevel) {
     ArduLog::_configuredLogLevel = logLevel;
 }
-
-// template<typename LogMessageT>
-// void ArduLog::Log(LogMessageT logMessage) {
-//     //ArduLog::_hwSerial->println(logMessage);
-//     // this->_hwSerial->println(logLevel);
-//     this->_hwSerial->println(logMessage);
-// }

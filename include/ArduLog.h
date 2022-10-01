@@ -86,7 +86,7 @@ class ArduLog {
                     break;
             }
 
-            this->printlnLog(logLevelStr.c_str(), filename, ":", lineNumber, " (f.", lineNumber, ") ",  args...);
+            this->printlnLog(logLevelStr.c_str(), filename, ":", lineNumber, " (f.", functionName, ") ",  args...);
 
         }
 

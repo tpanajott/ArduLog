@@ -49,7 +49,7 @@ class ArduLog {
         void Log(const ArduLogLevel logLevel, const char* filename, int lineNumber, const char* functionName, Args&&... args) {
             // Check if logLevel is a low enough level to be printed
             // Else, cancel operation.
-            if(logLevel > this->_configuredLogLevel && this->_configuredLogLevel != ArduLogLevel::None) {
+            if(logLevel > this->_configuredLogLevel || this->_configuredLogLevel == ArduLogLevel::None) {
                 return;
             }
 

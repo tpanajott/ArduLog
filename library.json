@@ -1,0 +1,23 @@
+{
+    "name": "ArduLog",
+    "version": "0.0.1",
+    "description": "A simple logging library for ESP8266 and ESP32",
+    "keywords": "logging, debug",
+    "repository":
+    {
+      "type": "git",
+      "url": "https://github.com/tpanajott/ArduLog.git"
+    },
+    "authors":
+    [
+      {
+        "name": "Tim Panajott"
+      }
+    ],
+    "license": "MIT",
+    "dependencies": {
+      
+    },
+    "frameworks": "arduino",
+    "platforms": "espressif8266, espressif32"
+  }

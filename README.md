@@ -1,6 +1,6 @@
 # ArduLog
 ArduLog is a simple to use library mean to print log messages to a serial console.
-ArduLog supports use of colors by stating `#define ARDULOG_USE_DECORATIONS 1` before importing ArduLog.h
+ArduLog supports use of colors by using `logger.SetUseDecorations(true)` before importing ArduLog.h
 
 ## With decorators
 ![with decorators](images/with_decorators.png)

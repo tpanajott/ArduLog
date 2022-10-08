@@ -1,23 +1,33 @@
 {
-    "name": "ArduLog",
-    "version": "0.0.3",
-    "description": "A simple logging library for ESP8266 and ESP32",
-    "keywords": "logging, debug",
-    "repository":
+  "name": "ArduLog",
+  "version": "0.0.5",
+  "description": "A simple logging library for ESP8266 and ESP32",
+  "keywords": "logging, debug, serial",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tpanajott/ArduLog.git"
+  },
+  "authors": [
     {
-      "type": "git",
-      "url": "https://github.com/tpanajott/ArduLog.git"
+      "name": "Tim Panajott"
+    }
+  ],
+  "license": "MIT",
+  "dependencies": {},
+  "frameworks": "arduino",
+  "platforms": "espressif8266, espressif32",
+  "examples": [
+    {
+      "name": "Basic Example",
+      "files": [
+        "examples/main.cpp"
+      ]
     },
-    "authors":
-    [
-      {
-        "name": "Tim Panajott"
-      }
-    ],
-    "license": "MIT",
-    "dependencies": {
-      
-    },
-    "frameworks": "arduino",
-    "platforms": "espressif8266, espressif32"
-  }
+    {
+      "name": "Advanced logging with colors",
+      "files": [
+        "examples/advanced_with_colors.cpp"
+      ]
+    }
+  ]
+}

@@ -17,10 +17,12 @@ class ArduLog {
  public:
   HardwareSerial *_hwSerial;
   ArduLogLevel _configuredLogLevel{ArduLogLevel::Debug};
+  bool _useDecorations = false;
   void init();
   // Configure the serial output to be used for logging
   void SetSerial(HardwareSerial *serial);
   void SetLogLevel(const ArduLogLevel logLevel);
+  void SetUseDecorations(bool useDecorations);
   static ArduLog *_instance;
   static ArduLog *getInstance();
 
@@ -54,86 +56,86 @@ class ArduLog {
 
     // Set logLevelStr according to logLevel
     std::string logLevelStr;
-#ifndef ARDULOG_USE_DECORATIONS
-    switch (logLevel) {
-      case ArduLogLevel::None:
-        logLevelStr = "[NONE]  ";
-        break;
+    if (this->_useDecorations) {
+      switch (logLevel) {
+        case ArduLogLevel::None:
+          logLevelStr = LOG_LIGHT_GRAY;
+          logLevelStr += "[NONE]  ";
+          logLevelStr += LOG_RESET_DECORATIONS;
+          break;
 
-      case ArduLogLevel::Error:
-        logLevelStr = "[ERROR] ";
-        break;
+        case ArduLogLevel::Error:
+          logLevelStr = LOG_RED;
+          logLevelStr += "[ERROR] ";
+          logLevelStr += LOG_RESET_DECORATIONS;
+          break;
 
-      case ArduLogLevel::Warning:
-        logLevelStr = "[WARN]  ";
-        break;
+        case ArduLogLevel::Warning:
+          logLevelStr = LOG_YELLOW;
+          logLevelStr += "[WARN]  ";
+          logLevelStr += LOG_RESET_DECORATIONS;
+          break;
 
-      case ArduLogLevel::Info:
-        logLevelStr = "[INFO]  ";
-        break;
+        case ArduLogLevel::Info:
+          logLevelStr = LOG_BLUE;
+          logLevelStr += "[INFO]  ";
+          logLevelStr += LOG_RESET_DECORATIONS;
+          break;
 
-      case ArduLogLevel::Debug:
-        logLevelStr = "[DEBUG] ";
-        break;
+        case ArduLogLevel::Debug:
+          logLevelStr = LOG_MAGENTA;
+          logLevelStr += "[DEBUG] ";
+          logLevelStr += LOG_RESET_DECORATIONS;
+          break;
 
-      case ArduLogLevel::Trace:
-        logLevelStr = "[TRACE] ";
-        break;
+        case ArduLogLevel::Trace:
+          logLevelStr = LOG_WHITE;
+          logLevelStr += "[TRACE] ";
+          logLevelStr += LOG_RESET_DECORATIONS;
+          break;
 
-      default:
-        logLevelStr = "[UNKNOWN] ";
-        break;
+        default:
+          logLevelStr = LOG_GRAY;
+          logLevelStr += "[UNKNOWN] ";
+          logLevelStr += LOG_RESET_DECORATIONS;
+          break;
+      }
+      this->printlnLog(logLevelStr.c_str(), filename, ":", lineNumber, " (f.",
+                       LOG_BOLD, functionName, LOG_RESET_DECORATIONS, ") ",
+                       args..., LOG_RESET_DECORATIONS);
+    } else {
+      switch (logLevel) {
+        case ArduLogLevel::None:
+          logLevelStr = "[NONE]  ";
+          break;
+
+        case ArduLogLevel::Error:
+          logLevelStr = "[ERROR] ";
+          break;
+
+        case ArduLogLevel::Warning:
+          logLevelStr = "[WARN]  ";
+          break;
+
+        case ArduLogLevel::Info:
+          logLevelStr = "[INFO]  ";
+          break;
+
+        case ArduLogLevel::Debug:
+          logLevelStr = "[DEBUG] ";
+          break;
+
+        case ArduLogLevel::Trace:
+          logLevelStr = "[TRACE] ";
+          break;
+
+        default:
+          logLevelStr = "[UNKNOWN] ";
+          break;
+      }
+      this->printlnLog(logLevelStr.c_str(), filename, ":", lineNumber, " (f.",
+                       functionName, ") ", args...);
     }
-    this->printlnLog(logLevelStr.c_str(), filename, ":", lineNumber, " (f.",
-                     functionName, ") ", args...);
-#else
-    switch (logLevel) {
-      case ArduLogLevel::None:
-        logLevelStr = LOG_LIGHT_GRAY;
-        logLevelStr += "[NONE]  ";
-        logLevelStr += LOG_RESET_COLOR;
-        break;
-
-      case ArduLogLevel::Error:
-        logLevelStr = LOG_RED;
-        logLevelStr += "[ERROR] ";
-        logLevelStr += LOG_RESET_COLOR;
-        break;
-
-      case ArduLogLevel::Warning:
-        logLevelStr = LOG_YELLOW;
-        logLevelStr += "[WARN]  ";
-        logLevelStr += LOG_RESET_COLOR;
-        break;
-
-      case ArduLogLevel::Info:
-        logLevelStr = LOG_BLUE;
-        logLevelStr += "[INFO]  ";
-        logLevelStr += LOG_RESET_COLOR;
-        break;
-
-      case ArduLogLevel::Debug:
-        logLevelStr = LOG_MAGENTA;
-        logLevelStr += "[DEBUG] ";
-        logLevelStr += LOG_RESET_COLOR;
-        break;
-
-      case ArduLogLevel::Trace:
-        logLevelStr = LOG_WHITE;
-        logLevelStr += "[TRACE] ";
-        logLevelStr += LOG_RESET_COLOR;
-        break;
-
-      default:
-        logLevelStr = LOG_GRAY;
-        logLevelStr += "[UNKNOWN] ";
-        logLevelStr += LOG_RESET_COLOR;
-        break;
-    }
-    this->printlnLog(logLevelStr.c_str(), filename, ":", lineNumber, " (f.",
-                     LOG_BOLD, functionName, LOG_RESET_COLOR, ") ", args...,
-                     LOG_RESET_COLOR);
-#endif
   }
 
  private:

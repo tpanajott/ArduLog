@@ -12,7 +12,7 @@
 #define LOG_LIGHT_GRAY "\e[1;37m"
 #define LOG_GRAY "\e[1;37m"
 #define LOG_WHITE "\e[1;97m"
-#define LOG_RESET_COLOR "\e[1;0m"
+#define LOG_RESET_DECORATIONS "\e[1;0m"
 
 #define LOG_BOLD "\e[1;1m"
 

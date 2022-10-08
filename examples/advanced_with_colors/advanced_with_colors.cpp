@@ -1,7 +1,6 @@
 // Uncomment the following to enable decorations in log output
 // Use a compatible serial monitor, in platformio set
 // monitor_raw = 1
-#define ARDULOG_USE_DECORATIONS 1
 
 #include <ArduLog.h>
 #include <Arduino.h>
@@ -14,6 +13,7 @@ void setup() {
   logger.init();
   logger.SetSerial(&Serial);
   logger.SetLogLevel(ArduLogLevel::Trace);
+  logger.SetUseDecorations(true);
 }
 
 void loop() {

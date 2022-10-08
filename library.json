@@ -1,6 +1,6 @@
 {
   "name": "ArduLog",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "A simple logging library for ESP8266 and ESP32",
   "keywords": "logging, debug, serial",
   "repository": {

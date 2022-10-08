@@ -19,14 +19,16 @@
   "examples": [
     {
       "name": "Basic Example",
+      "base": "examples/basic",
       "files": [
-        "examples/main.cpp"
+        "examples/basic/main.cpp"
       ]
     },
     {
       "name": "Advanced logging with colors",
+      "base": "examples/advanced_with_colors",
       "files": [
-        "examples/advanced_with_colors.cpp"
+        "examples/advanced_with_colors/main.cpp"
       ]
     }
   ]

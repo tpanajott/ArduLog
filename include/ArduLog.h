@@ -137,10 +137,13 @@ private:
   template <typename LogMessageT>
   bool _isDecorationString(LogMessageT logMessage)
   {
-    if (!this->_useDecorations && std::is_same<LogMessageT, const char *>::value == true)
+    if (!this->_useDecorations)
     {
-      std::string str = (const char *)logMessage;
-      return str.compare(0, 4, "\e[1;") == 0;
+      if constexpr (std::is_same<const char *, LogMessageT>::value)
+      {
+        std::string str = (const char *)logMessage;
+        return str.compare(0, 4, "\e[1;") == 0;
+      }
     }
     return false;
   }

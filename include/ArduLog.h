@@ -8,7 +8,6 @@
 
 #include <Arduino.h>
 #include <Snippets.h>
-#include <mutex>
 #include <string>
 
 enum class ArduLogLevel
@@ -24,7 +23,6 @@ enum class ArduLogLevel
 class ArduLog
 {
 public:
-  std::mutex serial_mtx;
   HardwareSerial *_hwSerial;
   ArduLogLevel _configuredLogLevel{ArduLogLevel::Debug};
   bool _useDecorations = false;
@@ -41,7 +39,10 @@ public:
   template <typename LogMessageT, typename... Args>
   void printlnLog(LogMessageT logMessage, Args... args)
   {
-    this->_hwSerial->print(logMessage);
+    if (!this->_isDecorationString(logMessage))
+    {
+      this->_hwSerial->print(logMessage);
+    }
 
     if (sizeof...(args) > 0)
     {
@@ -53,7 +54,11 @@ public:
   template <typename LogMessageT>
   void printlnLog(LogMessageT logMessage)
   {
-    this->_hwSerial->println(logMessage);
+    if (!this->_isDecorationString(logMessage))
+    {
+      this->_hwSerial->print(logMessage);
+    }
+    this->_hwSerial->println(); // Break line.
   }
 
   // This has to be in the header file to work unfortunetly.
@@ -66,100 +71,82 @@ public:
     {
       return;
     }
+
+#ifdef ESP32
     // Lock serial mutex
-    std::lock_guard<std::mutex> lck(this->serial_mtx);
+    xSemaphoreTake(this->_serialMutex, portMAX_DELAY);
+#endif
 
     // Set logLevelStr according to logLevel
     std::string logLevelStr;
-    if (this->_useDecorations)
+    switch (logLevel)
     {
-      switch (logLevel)
-      {
-      case ArduLogLevel::None:
-        logLevelStr = LOG_LIGHT_GRAY;
-        logLevelStr += "[NONE]  ";
-        logLevelStr += LOG_RESET_DECORATIONS;
-        break;
+    case ArduLogLevel::None:
+      logLevelStr = LOG_LIGHT_GRAY;
+      logLevelStr += "[NONE]  ";
+      logLevelStr += LOG_RESET_DECORATIONS;
+      break;
 
-      case ArduLogLevel::Error:
-        logLevelStr = LOG_RED;
-        logLevelStr += "[ERROR] ";
-        logLevelStr += LOG_RESET_DECORATIONS;
-        break;
+    case ArduLogLevel::Error:
+      logLevelStr = LOG_RED;
+      logLevelStr += "[ERROR] ";
+      logLevelStr += LOG_RESET_DECORATIONS;
+      break;
 
-      case ArduLogLevel::Warning:
-        logLevelStr = LOG_YELLOW;
-        logLevelStr += "[WARN]  ";
-        logLevelStr += LOG_RESET_DECORATIONS;
-        break;
+    case ArduLogLevel::Warning:
+      logLevelStr = LOG_YELLOW;
+      logLevelStr += "[WARN]  ";
+      logLevelStr += LOG_RESET_DECORATIONS;
+      break;
 
-      case ArduLogLevel::Info:
-        logLevelStr = LOG_BLUE;
-        logLevelStr += "[INFO]  ";
-        logLevelStr += LOG_RESET_DECORATIONS;
-        break;
+    case ArduLogLevel::Info:
+      logLevelStr = LOG_BLUE;
+      logLevelStr += "[INFO]  ";
+      logLevelStr += LOG_RESET_DECORATIONS;
+      break;
 
-      case ArduLogLevel::Debug:
-        logLevelStr = LOG_MAGENTA;
-        logLevelStr += "[DEBUG] ";
-        logLevelStr += LOG_RESET_DECORATIONS;
-        break;
+    case ArduLogLevel::Debug:
+      logLevelStr = LOG_MAGENTA;
+      logLevelStr += "[DEBUG] ";
+      logLevelStr += LOG_RESET_DECORATIONS;
+      break;
 
-      case ArduLogLevel::Trace:
-        logLevelStr = LOG_WHITE;
-        logLevelStr += "[TRACE] ";
-        logLevelStr += LOG_RESET_DECORATIONS;
-        break;
+    case ArduLogLevel::Trace:
+      logLevelStr = LOG_WHITE;
+      logLevelStr += "[TRACE] ";
+      logLevelStr += LOG_RESET_DECORATIONS;
+      break;
 
-      default:
-        logLevelStr = LOG_GRAY;
-        logLevelStr += "[UNKNOWN] ";
-        logLevelStr += LOG_RESET_DECORATIONS;
-        break;
-      }
-      this->printlnLog(logLevelStr.c_str(), filename, ":", lineNumber, " (f.",
-                       LOG_BOLD, functionName, LOG_RESET_DECORATIONS, ") ",
-                       args..., LOG_RESET_DECORATIONS);
+    default:
+      logLevelStr = LOG_GRAY;
+      logLevelStr += "[UNKNOWN] ";
+      logLevelStr += LOG_RESET_DECORATIONS;
+      break;
     }
-    else
-    {
-      switch (logLevel)
-      {
-      case ArduLogLevel::None:
-        logLevelStr = "[NONE]  ";
-        break;
+    this->printlnLog(logLevelStr.c_str(), filename, ":", lineNumber, " (f.",
+                     LOG_BOLD, functionName, LOG_RESET_DECORATIONS, ") ",
+                     args..., LOG_RESET_DECORATIONS);
 
-      case ArduLogLevel::Error:
-        logLevelStr = "[ERROR] ";
-        break;
-
-      case ArduLogLevel::Warning:
-        logLevelStr = "[WARN]  ";
-        break;
-
-      case ArduLogLevel::Info:
-        logLevelStr = "[INFO]  ";
-        break;
-
-      case ArduLogLevel::Debug:
-        logLevelStr = "[DEBUG] ";
-        break;
-
-      case ArduLogLevel::Trace:
-        logLevelStr = "[TRACE] ";
-        break;
-
-      default:
-        logLevelStr = "[UNKNOWN] ";
-        break;
-      }
-      this->printlnLog(logLevelStr.c_str(), filename, ":", lineNumber, " (f.",
-                       functionName, ") ", args...);
-    }
+#ifdef ESP32
+    xSemaphoreGive(this->_serialMutex);
+#endif
   }
 
 private:
   ArduLog *instance;
+  template <typename LogMessageT>
+  bool _isDecorationString(LogMessageT logMessage)
+  {
+    if (!this->_useDecorations && std::is_same<LogMessageT, const char *>::value == true)
+    {
+      std::string str = (const char *)logMessage;
+      return str.compare(0, 4, "\e[1;") == 0;
+    }
+    return false;
+  }
+#ifdef ESP32
+  SemaphoreHandle_t _serialMutex;
+#endif
 };
 
 #endif
